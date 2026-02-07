@@ -1,0 +1,1 @@
+# Ariseth-fuko-module
