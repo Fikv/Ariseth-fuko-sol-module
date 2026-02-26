@@ -1,8 +1,18 @@
 package domain
 
+type link struct {
+	linkType string;
+	label string; 
+	url string;
+}
+
+
 type token struct{
-	name string;
-	ca string;
-	mktCap float32;
-	price float32;
+	url string;
+	chainId string;
+	tokenAdress string;
+	icon string; 
+	header string; 
+	description string; 
+	links []link;
 }
