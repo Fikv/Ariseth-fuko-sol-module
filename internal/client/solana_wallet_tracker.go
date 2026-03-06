@@ -17,10 +17,7 @@ const (
 	tokenProgramID          = ""
 )
 
-type SolanaWalletTrackerClient struct {
-	http       *resty.Client
-	rpcBaseURL string
-}
+type SolanaWalletTrackerClient domain.SolanaWalletTrackerClient
 
 func NewSolanaWalletTrackerClient(httpClient *resty.Client) *SolanaWalletTrackerClient {
 	if httpClient == nil {
@@ -28,13 +25,13 @@ func NewSolanaWalletTrackerClient(httpClient *resty.Client) *SolanaWalletTracker
 	}
 
 	return &SolanaWalletTrackerClient{
-		http:       httpClient,
-		rpcBaseURL: strings.TrimRight(DefaultSolanaRPCBaseURL, "/"),
+		HTTP:       httpClient,
+		RPCBaseURL: strings.TrimRight(DefaultSolanaRPCBaseURL, "/"),
 	}
 }
 
 func (c *SolanaWalletTrackerClient) SetRPCBaseURL(baseURL string) {
-	c.rpcBaseURL = strings.TrimRight(baseURL, "/")
+	c.RPCBaseURL = strings.TrimRight(baseURL, "/")
 }
 
 func (c *SolanaWalletTrackerClient) GetWalletSnapshot(ctx context.Context, walletAddress string) (domain.WalletSnapshot, error) {
@@ -77,11 +74,11 @@ func (c *SolanaWalletTrackerClient) GetSOLBalance(ctx context.Context, walletAdd
 	}
 
 	var out solanaRPCResponse[solanaBalanceResult]
-	resp, err := c.http.R().
+	resp, err := c.HTTP.R().
 		SetContext(ctx).
 		SetBody(req).
 		SetResult(&out).
-		Post(c.rpcBaseURL)
+		Post(c.RPCBaseURL)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -111,11 +108,11 @@ func (c *SolanaWalletTrackerClient) GetTokenBalances(ctx context.Context, wallet
 	}
 
 	var out solanaRPCResponse[solanaTokenAccountsResult]
-	resp, err := c.http.R().
+	resp, err := c.HTTP.R().
 		SetContext(ctx).
 		SetBody(req).
 		SetResult(&out).
-		Post(c.rpcBaseURL)
+		Post(c.RPCBaseURL)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -149,56 +146,14 @@ func (c *SolanaWalletTrackerClient) GetTokenBalances(ctx context.Context, wallet
 	return tokenBalances, out.Result.Context.Slot, nil
 }
 
-type solanaRPCError struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
-type solanaRPCResponse[T any] struct {
-	JSONRPC string          `json:"jsonrpc"`
-	ID      int             `json:"id"`
-	Result  T               `json:"result"`
-	Error   *solanaRPCError `json:"error"`
-}
-
-type solanaContext struct {
-	Slot uint64 `json:"slot"`
-}
-
-type solanaBalanceResult struct {
-	Context solanaContext `json:"context"`
-	Value   uint64        `json:"value"`
-}
-
-type solanaTokenAccountsResult struct {
-	Context solanaContext        `json:"context"`
-	Value   []solanaTokenAccount `json:"value"`
-}
-
-type solanaTokenAccount struct {
-	Account solanaTokenAccountData `json:"account"`
-}
-
-type solanaTokenAccountData struct {
-	Data solanaParsedData `json:"data"`
-}
-
-type solanaParsedData struct {
-	Parsed solanaParsedInfo `json:"parsed"`
-}
-
-type solanaParsedInfo struct {
-	Info solanaTokenInfo `json:"info"`
-}
-
-type solanaTokenInfo struct {
-	Mint        string            `json:"mint"`
-	TokenAmount solanaTokenAmount `json:"tokenAmount"`
-}
-
-type solanaTokenAmount struct {
-	Amount         string  `json:"amount"`
-	Decimals       uint8   `json:"decimals"`
-	UIAmount       float64 `json:"uiAmount"`
-	UIAmountString string  `json:"uiAmountString"`
-}
+type solanaRPCError = domain.SolanaRPCError
+type solanaRPCResponse[T any] = domain.SolanaRPCResponse[T]
+type solanaContext = domain.SolanaContext
+type solanaBalanceResult = domain.SolanaBalanceResult
+type solanaTokenAccountsResult = domain.SolanaTokenAccountsResult
+type solanaTokenAccount = domain.SolanaTokenAccount
+type solanaTokenAccountData = domain.SolanaTokenAccountData
+type solanaParsedData = domain.SolanaParsedData
+type solanaParsedInfo = domain.SolanaParsedInfo
+type solanaTokenInfo = domain.SolanaTokenInfo
+type solanaTokenAmount = domain.SolanaTokenAmount

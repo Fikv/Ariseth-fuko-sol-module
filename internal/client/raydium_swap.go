@@ -31,7 +31,7 @@ func (c *RaydiumClient) ComputeSwapBaseIn(
 		out = map[string]any{}
 	}
 
-	resp, err := c.http.R().
+	resp, err := c.HTTP.R().
 		SetContext(ctx).
 		SetQueryParam("inputMint", inputMint).
 		SetQueryParam("outputMint", outputMint).
@@ -39,7 +39,7 @@ func (c *RaydiumClient) ComputeSwapBaseIn(
 		SetQueryParam("slippageBps", strconv.Itoa(slippageBps)).
 		SetQueryParam("txVersion", txVersion).
 		SetResult(&out).
-		Get(c.swapBaseURL + endpointSwapComputeBaseIn)
+		Get(c.SwapBaseURL + endpointSwapComputeBaseIn)
 	if err != nil {
 		return nil, err
 	}
@@ -66,12 +66,12 @@ func (c *RaydiumClient) BuildSwapTransactionBaseIn(
 	}
 
 	body := map[string]any{
-		"wallet":                         walletAddress,
-		"txVersion":                      txVersion,
-		"computeUnitPriceMicroLamports":  computeUnitPriceMicroLamports,
-		"swapResponse":                   swapResponse,
-		"wrapSol":                        wrapSol,
-		"unwrapSol":                      unwrapSol,
+		"wallet":                        walletAddress,
+		"txVersion":                     txVersion,
+		"computeUnitPriceMicroLamports": computeUnitPriceMicroLamports,
+		"swapResponse":                  swapResponse,
+		"wrapSol":                       wrapSol,
+		"unwrapSol":                     unwrapSol,
 	}
 	if inputTokenAccount != "" {
 		body["inputAccount"] = inputTokenAccount
@@ -85,11 +85,11 @@ func (c *RaydiumClient) BuildSwapTransactionBaseIn(
 		out = map[string]any{}
 	}
 
-	resp, err := c.http.R().
+	resp, err := c.HTTP.R().
 		SetContext(ctx).
 		SetBody(body).
 		SetResult(&out).
-		Post(c.swapBaseURL + endpointSwapTxBaseIn)
+		Post(c.SwapBaseURL + endpointSwapTxBaseIn)
 	if err != nil {
 		return nil, err
 	}
@@ -99,4 +99,3 @@ func (c *RaydiumClient) BuildSwapTransactionBaseIn(
 
 	return out, nil
 }
-

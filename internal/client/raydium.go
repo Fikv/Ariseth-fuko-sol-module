@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
+	"ariseth-fuko-sol-module/internal/domain"
 	"resty.dev/v3"
 )
 
 const (
-
 	DefaultAPIBaseURL  = "https://api-v3.raydium.io"
 	DefaultSwapBaseURL = "https://transaction-v1.raydium.io"
 )
@@ -63,17 +63,8 @@ const (
 	endpointLaunchpadList = "/main/launchpad"
 )
 
-type RaydiumClient struct {
-	apiBaseURL  string
-	swapBaseURL string
-	http        *resty.Client
-}
-
-type RaydiumResponse[T any] struct {
-	Success bool   `json:"success"`
-	Msg     string `json:"msg"`
-	Data    T      `json:"data"`
-}
+type RaydiumClient domain.RaydiumClient
+type RaydiumResponse[T any] = domain.RaydiumResponse[T]
 
 func NewRaydiumClient(httpClient *resty.Client) *RaydiumClient {
 	if httpClient == nil {
@@ -81,18 +72,18 @@ func NewRaydiumClient(httpClient *resty.Client) *RaydiumClient {
 	}
 
 	return &RaydiumClient{
-		apiBaseURL:  strings.TrimRight(DefaultAPIBaseURL, "/"),
-		swapBaseURL: strings.TrimRight(DefaultSwapBaseURL, "/"),
-		http:        httpClient,
+		APIBaseURL:  strings.TrimRight(DefaultAPIBaseURL, "/"),
+		SwapBaseURL: strings.TrimRight(DefaultSwapBaseURL, "/"),
+		HTTP:        httpClient,
 	}
 }
 
 func (c *RaydiumClient) SetAPIBaseURL(baseURL string) {
-	c.apiBaseURL = strings.TrimRight(baseURL, "/")
+	c.APIBaseURL = strings.TrimRight(baseURL, "/")
 }
 
 func (c *RaydiumClient) SetSwapBaseURL(baseURL string) {
-	c.swapBaseURL = strings.TrimRight(baseURL, "/")
+	c.SwapBaseURL = strings.TrimRight(baseURL, "/")
 }
 
 func (c *RaydiumClient) GetChainTime(ctx context.Context) (RaydiumResponse[map[string]any], error) {
@@ -121,7 +112,7 @@ func (c *RaydiumClient) GetTokenPrice(ctx context.Context, mintIDs []string) (Ra
 
 func (c *RaydiumClient) GetJupiterTokenList(ctx context.Context) (RaydiumResponse[[]map[string]any], error) {
 	var out []map[string]any
-	_, err := c.http.R().
+	_, err := c.HTTP.R().
 		SetContext(ctx).
 		SetResult(&out).
 		Get(endpointJupTokens)
@@ -281,8 +272,8 @@ func (c *RaydiumClient) getMap(ctx context.Context, path string, params url.Valu
 		out.Data = map[string]any{}
 	}
 
-	url := c.apiBaseURL + path
-	req := c.http.R().
+	url := c.APIBaseURL + path
+	req := c.HTTP.R().
 		SetContext(ctx).
 		SetResult(&out)
 	if params != nil {
@@ -309,6 +300,3 @@ func NewDefaultContext(timeout time.Duration) (context.Context, context.CancelFu
 	}
 	return context.WithTimeout(context.Background(), timeout)
 }
-
-
-
