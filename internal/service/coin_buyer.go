@@ -16,9 +16,7 @@ const (
 	defaultTxVersion = "V0"
 )
 
-type CoinBuyerService struct {
-	raydiumClient *client.RaydiumClient
-}
+type CoinBuyerService domain.CoinBuyerService
 
 func NewCoinBuyerService(raydiumClient *client.RaydiumClient) *CoinBuyerService {
 	if raydiumClient == nil {
@@ -26,7 +24,7 @@ func NewCoinBuyerService(raydiumClient *client.RaydiumClient) *CoinBuyerService 
 	}
 
 	return &CoinBuyerService{
-		raydiumClient: raydiumClient,
+		RaydiumClient: raydiumClient,
 	}
 }
 
@@ -52,7 +50,7 @@ func (s *CoinBuyerService) BuyByCA(ctx context.Context, req domain.BuyByCAReques
 
 	amountLamports := uint64(math.Round(req.SOLAmount * lamportsPerSOL))
 
-	quote, err := s.raydiumClient.ComputeSwapBaseIn(
+	quote, err := s.RaydiumClient.ComputeSwapBaseIn(
 		ctx,
 		wrappedSOLMint,
 		req.ContractAddress,
@@ -69,7 +67,7 @@ func (s *CoinBuyerService) BuyByCA(ctx context.Context, req domain.BuyByCAReques
 		swapResponse = data
 	}
 
-	transaction, err := s.raydiumClient.BuildSwapTransactionBaseIn(
+	transaction, err := s.RaydiumClient.BuildSwapTransactionBaseIn(
 		ctx,
 		req.WalletAddress,
 		txVersion,
@@ -92,4 +90,3 @@ func (s *CoinBuyerService) BuyByCA(ctx context.Context, req domain.BuyByCAReques
 		Transaction:         transaction,
 	}, nil
 }
-

@@ -7,9 +7,7 @@ import (
 	"ariseth-fuko-sol-module/internal/domain"
 )
 
-type WalletTrackerService struct {
-	client *client.SolanaWalletTrackerClient
-}
+type WalletTrackerService domain.WalletTrackerService
 
 func NewWalletTrackerService(walletClient *client.SolanaWalletTrackerClient) *WalletTrackerService {
 	if walletClient == nil {
@@ -17,12 +15,12 @@ func NewWalletTrackerService(walletClient *client.SolanaWalletTrackerClient) *Wa
 	}
 
 	return &WalletTrackerService{
-		client: walletClient,
+		Client: walletClient,
 	}
 }
 
 func (s *WalletTrackerService) TrackWallet(ctx context.Context, walletAddress string) (domain.WalletSnapshot, error) {
-	return s.client.GetWalletSnapshot(ctx, walletAddress)
+	return s.Client.GetWalletSnapshot(ctx, walletAddress)
 }
 
 func (s *WalletTrackerService) TrackWallets(ctx context.Context, walletAddresses []string) ([]domain.WalletSnapshot, error) {
