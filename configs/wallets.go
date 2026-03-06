@@ -1,7 +1,5 @@
 package configs
 
+import "ariseth-fuko-sol-module/internal/domain"
 
-type Wallet struct {
-	Address string
-	Value   float64
-}
+type Wallet = domain.Wallet
