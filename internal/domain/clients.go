@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"time"
 
 	"resty.dev/v3"
 )
@@ -35,6 +36,12 @@ type MeteoraResponse[T any] struct {
 type SolanaWalletTrackerClient struct {
 	HTTP       *resty.Client
 	RPCBaseURL string
+}
+
+type PreMatchScraperClient struct {
+	HTTP      *resty.Client
+	BaseURL   string
+	UserAgent string
 }
 
 type SolanaRPCError struct {
@@ -115,4 +122,14 @@ type RaydiumSwapClient interface {
 		inputTokenAccount string,
 		outputTokenAccount string,
 	) (map[string]any, error)
+}
+
+type PreMatchPageGetter interface {
+	GetPreMatchHTML(ctx context.Context, sportSlug string) (string, error)
+}
+
+type PreMatchSnapshot struct {
+	SportSlug string    `json:"sportSlug"`
+	HTML      string    `json:"html"`
+	FetchedAt time.Time `json:"fetchedAt"`
 }
