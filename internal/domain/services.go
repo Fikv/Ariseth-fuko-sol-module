@@ -12,6 +12,8 @@ type PreMatchScraperService struct {
 	Client PreMatchPageGetter
 }
 
+type DataAnalysisService struct{}
+
 type Wallet struct {
 	Address string
 	Value   float64
